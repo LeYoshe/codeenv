@@ -1,0 +1,29 @@
+version: 2
+updates:
+  # Enable version update PRs after the initial repository setup.
+  - package-ecosystem: cargo
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 0
+  - package-ecosystem: npm
+    directory: /tools/codemirror
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 0
+    groups:
+      codemirror:
+        patterns: ["*"]
+  - package-ecosystem: npm
+    directory: /tools/browser
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 0
+  - package-ecosystem: github-actions
+    open-pull-requests-limit: 0
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ["*"]

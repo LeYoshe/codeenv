@@ -1,0 +1,12 @@
+/target
+
+/dist/
+/site-preview/
+.DS_Store
+dev.toml
+__pycache__/
+
+# Personal Claude Code permissions and settings
+.claude/settings.local.json
+
+/coverage/

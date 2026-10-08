@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content">
+<title>codeenv</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23161b22'/%3E%3Cpath d='M8 11l6 5-6 5' stroke='%237ee787' stroke-width='2.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3Cpath d='M16 22h8' stroke='%23c9d1d9' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E">
+<!-- Loaded on demand; the server versions this URL like the others. -->
+<meta name="codemirror-src" content="/assets/vendor/codemirror.js">
+<link rel="stylesheet" href="/assets/vendor/xterm.css">
+<link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+<div id="app">
+  <header id="topbar">
+    <button class="icon-btn" id="toggle-sidebar" title="Toggle sidebar (Alt+Shift+B)" aria-label="Sidebar">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg>
+    </button>
+    <div id="brand"><span class="brand-mark">&gt;_</span><span id="host-name">codeenv</span></div>
+    <div id="buttons" role="toolbar" aria-label="Commands"></div>
+    <div class="spacer"></div>
+    <button id="open-palette" class="ghost-btn" title="Command palette">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg>
+      <span>Search…</span><kbd id="palette-kbd">Alt+Shift+P</kbd>
+    </button>
+    <span id="user" title=""></span>
+  </header>
+
+  <div id="main">
+    <aside id="sidebar">
+      <section class="panel collapsed" id="panel-search">
+        <div class="panel-head">
+          <button class="panel-toggle" data-panel="search"><svg class="chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>Search <span class="count" id="search-count"></span></button>
+        </div>
+        <div class="panel-body">
+          <form id="search-form" autocomplete="off">
+            <div class="search-box">
+              <input id="search-input" placeholder="Search text in files" spellcheck="false" aria-label="Search files">
+              <button type="button" class="search-opt" id="search-case" title="Match case" aria-pressed="false">Aa</button>
+              <button type="button" class="search-opt" id="search-regex" title="Regular expression" aria-pressed="false">.*</button>
+            </div>
+            <div class="search-scope">in <button type="button" id="search-scope" title="Click to search in the folder selected in the explorer"></button></div>
+          </form>
+          <div id="search-summary" class="muted"></div>
+          <ul id="search-results"></ul>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-files">
+        <div class="panel-head">
+          <button class="panel-toggle" data-panel="files"><svg class="chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>Files</button>
+          <div class="panel-actions">
+            <button class="icon-btn sm" id="fs-newfile" title="New file in the selected folder"><svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M12 11v6M9 14h6"/></svg></button>
+            <button class="icon-btn sm" id="fs-newfolder" title="New folder in the selected folder"><svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M12 10v6M9 13h6"/></svg></button>
+            <button class="icon-btn sm" id="fs-upload" title="Upload files or a folder (or drop them in the file tree)"><svg viewBox="0 0 24 24"><path d="M12 19V8M7 13l5-5 5 5M5 4h14"/></svg></button>
+            <button class="icon-btn sm" id="fs-up" title="Go up one level"><svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+            <button class="icon-btn sm" id="fs-hidden" title="Show hidden files"><svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button>
+            <button class="icon-btn sm" id="fs-collapse" title="Collapse all"><svg viewBox="0 0 24 24"><path d="M7 14l5-5 5 5"/><path d="M7 19l5-5 5 5" opacity=".5"/></svg></button>
+            <button class="icon-btn sm" id="fs-refresh" title="Refresh"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.34-5.66M20 4v5h-5"/></svg></button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div id="fs-root" title=""></div>
+          <div id="tree" tabindex="0" role="tree" aria-label="File tree"></div>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-terms">
+        <div class="panel-head">
+          <button class="panel-toggle" data-panel="terms"><svg class="chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>Terminals <span class="count" id="terms-count"></span></button>
+          <div class="panel-actions">
+            <button class="icon-btn sm" id="terms-new" title="New terminal in the selected folder (Alt+Shift+T)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+          </div>
+        </div>
+        <div class="panel-body"><ul id="term-list" class="list"></ul></div>
+      </section>
+
+      <section class="panel" id="panel-ports">
+        <div class="panel-head">
+          <button class="panel-toggle" data-panel="ports"><svg class="chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>Ports <span class="count" id="ports-count"></span></button>
+          <div class="panel-actions">
+            <button class="icon-btn sm" id="ports-refresh" title="Refresh"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.34-5.66M20 4v5h-5"/></svg></button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <ul id="port-list" class="list"></ul>
+          <form id="port-form" autocomplete="off">
+            <input id="port-input" inputmode="numeric" pattern="[0-9]*" placeholder="Open a port… e.g. 8080" aria-label="Port">
+            <button type="submit" class="icon-btn sm" title="Open"><svg viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg></button>
+          </form>
+        </div>
+      </section>
+    </aside>
+    <div id="resizer" role="separator" aria-orientation="vertical" title="Drag to resize · double-click or drag left to collapse">
+      <button id="sidebar-fold" title="Collapse sidebar (Alt+Shift+B)" aria-label="Collapse sidebar"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
+    </div>
+    <nav id="rail" aria-label="Panels">
+      <button class="icon-btn" id="rail-unfold" title="Expand sidebar (Alt+Shift+B)"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
+      <hr>
+      <button class="icon-btn" data-panel="files" title="Explorer"><svg viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></button>
+      <button class="icon-btn" data-panel="search" title="Search (Alt+Shift+F)"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg></button>
+      <button class="icon-btn" data-panel="terms" title="Terminals"><svg viewBox="0 0 24 24"><path d="M5 7l5 5-5 5M12 18h7"/></svg></button>
+      <button class="icon-btn" data-panel="ports" title="Ports"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></button>
+    </nav>
+
+    <section id="workspace">
+      <nav id="tabbar">
+        <div id="tabs" role="tablist"></div>
+        <button class="icon-btn" id="tab-new" title="New terminal (Alt+Shift+T)"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+        <span class="spacer"></span>
+        <button class="icon-btn" id="kbd-lock" title="Fullscreen keyboard: send all keys, including Ctrl+W / Ctrl+T / Ctrl+N, to the terminal (hold Escape to exit)"><svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M8 14h8"/></svg></button>
+      </nav>
+      <div id="views"></div>
+      <div id="empty">
+        <div class="empty-inner">
+          <div class="empty-mark">&gt;_</div>
+          <h1 id="empty-title">codeenv</h1>
+          <p class="muted">Open a terminal in an explorer folder, or run a command from the top bar.</p>
+          <div class="empty-actions">
+            <button class="primary-btn" id="empty-new">New terminal</button>
+            <button class="ghost-btn" id="empty-palette">Command palette</button>
+          </div>
+          <p class="muted small">Shortcuts work outside terminal and editor views. The keyboard button enables fullscreen to pass through keys reserved by the browser.</p>
+          <dl class="shortcuts">
+            <dt><kbd>Alt+Shift+T</kbd></dt><dd>New terminal (selected folder)</dd>
+            <dt><kbd>Alt+Shift+P</kbd></dt><dd>Palette: terminals, commands, ports</dd>
+            <dt><kbd>Alt+Shift+W</kbd></dt><dd>Close tab</dd>
+            <dt><kbd>Alt+Shift+←/→</kbd></dt><dd>Previous / next tab</dd>
+            <dt><kbd>Alt+Shift+1…9</kbd></dt><dd>Go to tab n</dd>
+            <dt><kbd>Alt+Shift+E</kbd></dt><dd>Focus explorer</dd>
+            <dt><kbd>Alt+Shift+F</kbd></dt><dd>Search files</dd>
+            <dt><kbd>Alt+Shift+B</kbd></dt><dd>Toggle sidebar</dd>
+          </dl>
+        </div>
+      </div>
+      <div id="mobile-keys" hidden>
+        <button data-key="esc">Esc</button><button data-key="tab">Tab</button><button data-key="ctrl" class="mod">Ctrl</button>
+        <button data-key="up">↑</button><button data-key="down">↓</button><button data-key="left">←</button><button data-key="right">→</button>
+        <button data-key="pipe">|</button><button data-key="tilde">~</button><button data-key="slash">/</button>
+      </div>
+    </section>
+  </div>
+</div>
+
+<div id="palette" hidden>
+  <div class="palette-box" role="dialog" aria-label="Command palette">
+    <input id="palette-input" placeholder="Terminal, command, port, action…" autocomplete="off" spellcheck="false">
+    <ul id="palette-list" role="listbox"></ul>
+  </div>
+</div>
+
+<div id="ctxmenu" hidden role="menu"></div>
+
+<dialog id="button-dialog">
+  <form method="dialog" id="button-form">
+    <h2 id="button-dialog-title">New command</h2>
+    <label>Name<input name="name" required maxlength="40" placeholder="e.g. Dev server"></label>
+    <label>Command<textarea name="command" required rows="3" spellcheck="false" placeholder="e.g. npm run dev"></textarea></label>
+    <label>Folder
+      <input name="cwd" spellcheck="false" placeholder="empty = selected explorer folder">
+      <small class="muted">Absolute, <code>~/…</code>, or relative to the root.</small>
+    </label>
+    <fieldset class="colors"><legend>Color</legend></fieldset>
+    <div class="dialog-actions">
+      <button type="button" class="danger-btn" id="button-delete">Delete</button>
+      <span class="spacer"></span>
+      <button type="button" class="ghost-btn" value="cancel" id="button-cancel">Cancel</button>
+      <button type="submit" class="primary-btn" value="save">Save</button>
+    </div>
+  </form>
+</dialog>
+
+<div id="transfers" hidden>
+  <div class="tr-head"><span id="tr-title"></span><button class="icon-btn sm" id="tr-close" title="Hide completed uploads"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <div class="tr-progress"><div id="tr-bar"></div></div>
+  <ul id="tr-list"></ul>
+</div>
+
+<div id="toasts" aria-live="polite"></div>
+
+<script src="/assets/vendor/xterm.js"></script>
+<script src="/assets/vendor/addon-fit.js"></script>
+<script src="/assets/vendor/addon-web-links.js"></script>
+<script src="/assets/vendor/addon-unicode11.js"></script>
+<script src="/assets/vendor/addon-webgl.js"></script>
+<script src="/assets/app.js"></script>
+</body>
+</html>

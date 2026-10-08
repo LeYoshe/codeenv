@@ -1,0 +1,15 @@
+# Install at /etc/cloudflared/config.yml.
+# Replace the tunnel ID, credentials file path, and domains.
+tunnel: <TUNNEL-UUID>
+credentials-file: /etc/cloudflared/<TUNNEL-UUID>.json
+
+ingress:
+  # codeenv interface.
+  - hostname: vps1.example.com
+    service: http://127.0.0.1:7681
+  # Local apps, when ports.host_template is configured.
+  # Remove if unused. DNS and Access must cover these names too.
+  - hostname: "*.example.com"
+    service: http://127.0.0.1:7681
+  # Other names are not forwarded to codeenv.
+  - service: http_status:404

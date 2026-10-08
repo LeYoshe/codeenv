@@ -1,0 +1,50 @@
+[package]
+name = "codeenv"
+version = "0.1.0"
+description = "Web terminals, file explorer and port forwarding behind Cloudflare Access"
+edition = "2024"
+license = "MIT"
+repository = "https://github.com/leyoshe/codeenv"
+homepage = "https://leyoshe.github.io/codeenv/"
+readme = "README.md"
+
+[dependencies]
+anyhow = "1.0.104"
+axum = { version = "0.8.9", features = ["ws"] }
+clap = { version = "4.6.7", features = ["derive", "env"] }
+futures-util = { version = "0.3.34", features = ["sink"] }
+grep-matcher = "0.1.9"
+grep-regex = "0.1.14"
+grep-searcher = "0.1.17"
+hyper = { version = "1.12.0", features = ["full"] }
+hyper-util = { version = "0.1.21", features = ["client-legacy", "tokio", "http1"] }
+ignore = "0.4.33"
+jsonwebtoken = { version = "11.1.0", features = ["aws_lc_rs"] }
+libc = "0.2.190"
+mime_guess = "2.0.5"
+portable-pty = "0.9.0"
+rand = "0.10.3"
+reqwest = { version = "0.13.5", default-features = false, features = ["rustls-no-provider", "json"] }
+rust-embed = "8.13.0"
+rustls = { version = "0.23.45", default-features = false, features = ["ring", "std", "tls12"] }
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.151"
+sha2 = "0.11.0"
+tokio = { version = "1.53.2", features = ["full"] }
+tokio-util = { version = "0.7.19", features = ["io"] }
+toml = "1.1.7"
+tracing = "0.1.44"
+tracing-subscriber = { version = "0.3.23", features = ["env-filter"] }
+vt100 = "0.16.2"
+walkdir = "2.5.0"
+zip = { version = "8.6.0", default-features = false, features = ["deflate"] }
+
+[dev-dependencies]
+tokio-tungstenite = "0.30.0"
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+strip = true
+# Keep panic unwinding so a failed task does not abort the daemon.

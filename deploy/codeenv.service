@@ -1,0 +1,23 @@
+# Install at /etc/systemd/system/codeenv.service.
+[Unit]
+Description=codeenv — terminals, files, and web apps
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+# Replace with the account that owns your projects.
+User=codeenv
+Group=codeenv
+Environment=CODEENV_CONFIG=/etc/codeenv/config.toml
+ExecStart=/usr/local/bin/codeenv
+Restart=on-failure
+RestartSec=2
+
+# New files are accessible only to the service account.
+UMask=0077
+
+# Stopping the web server leaves the daemon and its terminals running.
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target

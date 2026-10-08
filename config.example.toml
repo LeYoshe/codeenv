@@ -1,0 +1,63 @@
+# Copy to /etc/codeenv/config.toml and adjust the values.
+# Guide: docs/deployment.md
+
+# Local address where cloudflared forwards requests.
+listen = "127.0.0.1:7681"
+
+# Name shown in the interface. Default: machine hostname.
+# name = "vps1"
+
+# Explorer's starting folder. Default: home directory ($HOME).
+# root = "/home/codeenv"
+
+# Personal commands, daemon socket, and daemon log.
+# Default: $HOME/.local/share/codeenv.
+# data_dir = "/home/codeenv/.local/share/codeenv"
+
+# Shell for new terminals. Default: $SHELL, then bash.
+# shell = "/usr/bin/zsh"
+
+# Interface domains. Set these in production.
+# Port domains are matched separately using host_template.
+# Without this list, Access mode accepts any hostname.
+# hosts = ["vps1.example.com"]
+
+# Scrollback lines per terminal. Applied when the daemon starts.
+# scrollback = 5000
+
+# Maximum open terminals per Access user.
+# max_terminals = 50
+
+[auth]
+mode = "cloudflare_access"
+# Cloudflare Zero Trust team, for example myteam.cloudflareaccess.com.
+team_domain = "myteam"
+# AUD tags of the Access applications protecting the UI and forwarded ports.
+audiences = ["REPLACE_WITH_ACCESS_AUD_TAG"]
+
+# For local development, replace the entire [auth] section with:
+# [auth]
+# mode = "insecure"
+# user = "me@example.com"
+
+[ports]
+# Public address for each port: p5173-vps1.example.com for port 5173.
+# Requires DNS, tunnel, and Access coverage. Disabled when omitted.
+# host_template = "p{port}-vps1.example.com"
+
+# Send localhost:<port> as the Host header to the local app.
+# The public hostname is passed in X-Forwarded-Host.
+# rewrite_host = true
+
+# Ports excluded from forwarding. codeenv's own port is always excluded.
+# deny = [22]
+
+# Shared commands, not editable through the interface.
+# Each user can also add personal commands.
+[[buttons]]
+name = "htop"
+command = "htop"
+color = "#3fb950"
+# Working directory: absolute, ~/…, or relative to root.
+# Without cwd, the command uses the folder selected in the explorer.
+# cwd = "~"

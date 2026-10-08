@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/leyoshe/codeenv/security/advisories/new
+    about: Report vulnerabilities privately. See SECURITY.md if reporting is unavailable.
+  - name: Troubleshooting
+    url: https://github.com/leyoshe/codeenv/blob/main/docs/troubleshooting.md
+    about: Check common setup and connection problems before opening an issue.

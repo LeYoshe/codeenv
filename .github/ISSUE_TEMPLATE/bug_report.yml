@@ -1,0 +1,41 @@
+name: Bug report
+description: Report something that does not work as expected.
+title: "[Bug]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For vulnerabilities, use private reporting from SECURITY.md.
+        Remove tokens, cookies, credentials, and personal details from logs.
+  - type: input
+    id: version
+    attributes:
+      label: codeenv version
+      description: Output of `codeenv --version`, or the commit you built.
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      placeholder: "Ubuntu 24.04 ARM64; Firefox 140; Cloudflare Access"
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Include a minimal example when possible.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected and actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs or screenshots
+      description: Check both the web server log and data_dir/ptyd.log for terminal problems.

@@ -1,0 +1,12 @@
+{
+  "name": "codeenv-browser-checks",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "test": "node smoke.cjs",
+    "capture": "node capture.cjs"
+  },
+  "devDependencies": {
+    "playwright": "1.64.0"
+  }
+}

@@ -79,8 +79,8 @@ browser. The keyboard button enables fullscreen and keyboard lock in browsers
 that support them.
 
 Terminal selections are copied automatically when the browser grants clipboard
-access. When a program captures the mouse, use `Shift+drag` (`⌥+drag` on Mac)
-to select text.
+access, and right-clicking a terminal pastes. When a program captures the mouse,
+use `Shift+drag` (`⌥+drag` on Mac) to select text.
 
 ## Development
 

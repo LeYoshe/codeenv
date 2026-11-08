@@ -268,6 +268,14 @@
           this.paste(shellQuote(path) + " ");
         }
       });
+      // Right-click pastes the clipboard, like most terminals. Touch devices
+      // keep the browser's own long-press selection and paste menu.
+      if (!isTouch) {
+        this.el.addEventListener("contextmenu", (e) => {
+          e.preventDefault();
+          this.pasteFromClipboard();
+        });
+      }
 
       this.tab = makeTab(this, {
         title: this.info()?.title || "terminal",
@@ -388,6 +396,22 @@
       // the PTY through a programmatic paste, whatever the caller passed.
       this.term.paste(stripControl(text));
       this.term.focus();
+    }
+
+    async pasteFromClipboard() {
+      if (!this.isPrimary()) return;
+      try {
+        // Native paste path: keeps newlines and honours bracketed paste mode,
+        // exactly like ⌘V / Ctrl+Shift+V. The clipboard is the user's own
+        // content, so it is not stripped the way an inserted path is.
+        const text = await navigator.clipboard.readText();
+        if (text) this.term.paste(text);
+        this.term.focus();
+      } catch {
+        // No async clipboard (insecure context) or the read was denied, as
+        // Firefox does for web pages. The keyboard paste still works.
+        toast(isMac ? "Cannot read the clipboard — use ⌘V" : "Cannot read the clipboard — use Ctrl+Shift+V", "error");
+      }
     }
 
     /** Views stay laid out (visibility, not display), so even background

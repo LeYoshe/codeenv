@@ -235,6 +235,21 @@
         const selection = this.term.getSelection();
         if (selection) navigator.clipboard?.writeText(selection).catch(() => {});
       });
+      // OSC 52: a program in the terminal (tmux `set-clipboard on`, vim's
+      // clipboard=unnamed, yank tools…) sets the system clipboard. Write only:
+      // a read query ("?") is refused, so a program can never exfiltrate the
+      // clipboard. Gated on the focused view so a background tab can't write it.
+      this.term.parser.registerOscHandler(52, (payload) => {
+        const data = payload.slice(payload.indexOf(";") + 1);
+        if (!this.isPrimary() || !data || data === "?") return true;
+        try {
+          const bytes = Uint8Array.from(atob(data), (c) => c.charCodeAt(0));
+          navigator.clipboard?.writeText(new TextDecoder().decode(bytes)).catch(() => {});
+        } catch {
+          /* not valid base64 */
+        }
+        return true;
+      });
 
       // Drop files/folders from the explorer: insert their path.
       acceptFileDrops(this.el, () => this.info()?.cwd || null);

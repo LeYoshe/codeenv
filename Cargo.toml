@@ -1,6 +1,6 @@
 [package]
 name = "codeenv"
-version = "0.1.0"
+version = "0.2.0"
 description = "Web terminals, file explorer and port forwarding behind Cloudflare Access"
 edition = "2024"
 license = "MIT"
